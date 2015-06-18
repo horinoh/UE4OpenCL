@@ -1,22 +1,25 @@
 {
-	"FileVersion": 3,
-	"EngineAssociation": "{D277C02A-4F3D-91E4-0847-BA80D7A2BC75}",
-	"Category": "",
-	"Description": "",
-	"Modules": [
-		{
-			"Name": "UE4OpenCL",
-			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"CoreUObject"
-			]
-		},
-		{
-			"Name": "EditorModule",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
-		}
-	]
+    "FileVersion": 3,
+    "EngineAssociation": "{D277C02A-4F3D-91E4-0847-BA80D7A2BC75}",
+    "Category": "",
+    "Description": "",
+    "Modules": [
+        {
+            "Name": "UE4OpenCL",
+            "Type": "Runtime",
+            "LoadingPhase": "Default",
+            "AdditionalDependencies": [
+                "Engine",
+                "CoreUObject"
+            ]
+        },
+        {
+            "Name": "UE4OpenCLEd",
+            "Type": "Editor",
+            "LoadingPhase": "Default",
+            "AdditionalDependencies": [
+                "UnrealEd"
+            ]
+        }
+    ]
 }

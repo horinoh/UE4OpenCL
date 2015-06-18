@@ -20,6 +20,6 @@ public class UE4OpenCLEditorTarget : TargetRules
 		ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.AddRange(new string[] { "UE4OpenCL", "EditorModule" });
+		OutExtraModuleNames.AddRange(new string[] { "UE4OpenCL", "UE4OpenCLEd" });
 	}
 }

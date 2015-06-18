@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class EditorModule : ModuleRules
+	public class UE4OpenCLEd : ModuleRules
 	{
-		public EditorModule(TargetInfo Target)
+		public UE4OpenCLEd(TargetInfo Target)
 		{
 			PublicIncludePaths.AddRange(
 				new string[] {
@@ -14,7 +14,7 @@ namespace UnrealBuildTool.Rules
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"Developer/EditorModule/Private",
+					"Developer/UE4OpenCLEd/Private",
 					// ... add other private include paths required here ...
 				}
 				);
@@ -25,6 +25,7 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					// ... add other public dependencies that you statically link with here ...
 					"CoreUObject",
+					"Engine",
 					"UnrealEd",
 					"UE4OpenCL",
 				}

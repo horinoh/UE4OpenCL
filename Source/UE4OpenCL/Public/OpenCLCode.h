@@ -16,4 +16,9 @@ class UE4OPENCL_API UOpenCLCode : public UObject
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = OpenCL)
 	FString Code;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Instanced, Category = Reimport)
+	class UAssetImportData* AssetImportData;
+#endif
 };
