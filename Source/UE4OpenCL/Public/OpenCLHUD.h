@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = OpenCL)
 	class UOpenCLComponent* OpenCLComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = OpenCL)
+	class UOpenCLCode* OpenCLCode;
 };

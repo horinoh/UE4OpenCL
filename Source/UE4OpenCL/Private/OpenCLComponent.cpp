@@ -3,6 +3,7 @@
 #include "UE4OpenCL.h"
 #include "OpenCLComponent.h"
 
+#include "OpenCLCode.h"
 
 // Sets default values for this component's properties
 UOpenCLComponent::UOpenCLComponent()
@@ -13,15 +14,12 @@ UOpenCLComponent::UOpenCLComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+
 }
 
-
-// Called when the game starts
-void UOpenCLComponent::BeginPlay()
+void UOpenCLComponent::OnComponentCreated()
 {
-	Super::BeginPlay();
-
-	// ...
+	Super::OnComponentCreated();
 
 	//!< プラットホームID、デバイスIDの列挙とコンテキストの作成
 	//!< Enumerate platformIDs, deviceIDs and create context
@@ -45,80 +43,32 @@ void UOpenCLComponent::BeginPlay()
 						cl_int ErrorCode;
 						Contexts.Add(clCreateContext(nullptr, DeviceNum, &DeviceIDs[i][0], nullptr, nullptr, &ErrorCode));
 						check(CL_SUCCESS == ErrorCode);
-					}
-				}
-			}
-		}
-	}
-
-	//!< OpenCL コードの読み込み、ビルド、実行 (ここでは最初のコンテキストを使用)
-	//!< Load OpenCL code, build, execute (using first context here)
-	if (0 < Contexts.Num() && 0 < DeviceIDs[0].Num())
-	{
-		cl_int ErrorCode;
-		const auto CommandQueue = clCreateCommandQueue(Contexts[0], DeviceIDs[0][0], 0, &ErrorCode);
-		if (CL_SUCCESS == ErrorCode)
-		{
-			const FString Code("kernel void main(__global float* buffer){const unsigned int id = get_global_id(0);buffer[id] = 9.0f - id;}");
-			const char* Ansi = TCHAR_TO_ANSI(*Code);
-			const size_t Length = Code.Len();
-			const auto Program = clCreateProgramWithSource(Contexts[0], 1, &Ansi, &Length, &ErrorCode);
-			if (CL_SUCCESS == ErrorCode)
-			{
-				if (CL_SUCCESS == clBuildProgram(Program, DeviceIDs[0].Num(), &DeviceIDs[0][0], nullptr, nullptr, nullptr))
-				{
-					const auto Kernel = clCreateKernel(Program, "main", &ErrorCode);
-					if (CL_SUCCESS == ErrorCode) 
-					{
-						//!< GPU 上へメモリ確保
-						//!< Allocate memory on GPU
-						const auto Buffer = clCreateBuffer(Contexts[0], CL_MEM_READ_WRITE, sizeof(float) * 10, nullptr, &ErrorCode);
 						if (CL_SUCCESS == ErrorCode)
 						{
-							//!< GPU へデータ転送 (コマンドキュー)
-							//!< Send data to GPU (CommandQueue)
-							const float in_data[] = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f };
-							if (CL_SUCCESS == clEnqueueWriteBuffer(CommandQueue, Buffer, CL_TRUE, 0, sizeof(float) * 10, in_data, 0, nullptr, nullptr)) {
-								//!< カーネル引数の設定
-								//!< Arguments of kernel
-								if (CL_SUCCESS == clSetKernelArg(Kernel, 0, sizeof(Buffer), &Buffer))
-								{
-									//!< カーネルの実行
-									//!< Execute kernel
-									const size_t GlobalWork = 10;
-									const size_t LocalWork = 1;
-									if (CL_SUCCESS == clEnqueueNDRangeKernel(CommandQueue, Kernel, 1, nullptr, &GlobalWork, &LocalWork, 0, nullptr, nullptr)) 
-									{
-										//!< 結果の取得
-										//!< Get result
-										float out_data[10];
-										if (CL_SUCCESS == clEnqueueReadBuffer(CommandQueue, Buffer, CL_TRUE, 0, sizeof(float) * 10, &out_data, 0, nullptr, nullptr)) 
-										{
-											GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Done"));
-										}
-									}
-								}
-							}
 						}
-						clReleaseMemObject(Buffer);
 					}
-					clReleaseKernel(Kernel);
 				}
 			}
-			clReleaseProgram(Program);
 		}
-		clReleaseCommandQueue(CommandQueue);
 	}
 }
-
-void UOpenCLComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UOpenCLComponent::OnComponentDestroyed()
 {
-	Super::EndPlay(EndPlayReason);
+	Super::OnComponentDestroyed();
 
 	for (auto i : Contexts)
 	{
 		clReleaseContext(i);
 	}
+}
+
+// Called when the game starts
+void UOpenCLComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// ...
+
 }
 
 // Called every frame
@@ -129,3 +79,119 @@ void UOpenCLComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAct
 	// ...
 }
 
+cl_kernel UOpenCLComponent::CreateKernel(const class UOpenCLCode& CodeAsset, const FString KernelName)
+{
+	cl_kernel Kernel = nullptr;
+	//!< OpenCL コードの読み込み、ビルド(ここでは最初のコンテキストを使用)
+	//!< Load OpenCL code, build(using first context here)
+	if (0 < Contexts.Num() && 0 < DeviceIDs[0].Num())
+	{
+		cl_int ErrorCode;
+
+		const char* AnsiCode = TCHAR_TO_ANSI(*CodeAsset.Code);
+		const size_t Length = CodeAsset.Code.Len();
+		const auto Program = clCreateProgramWithSource(Contexts[0], 1, &AnsiCode, &Length, &ErrorCode);
+		if (CL_SUCCESS == ErrorCode)
+		{
+			if (CL_SUCCESS == clBuildProgram(Program, DeviceIDs[0].Num(), &DeviceIDs[0][0], nullptr, nullptr, nullptr))
+			{
+				Kernel = clCreateKernel(Program, TCHAR_TO_ANSI(*KernelName), &ErrorCode);
+				if (CL_SUCCESS == ErrorCode)
+				{
+				}
+			}
+			clReleaseProgram(Program);
+		}
+	}
+	return Kernel;
+}
+
+cl_command_queue UOpenCLComponent::CreateCommandQueue()
+{
+	cl_command_queue CommandQueue = nullptr;
+	if (0 < Contexts.Num() && 0 < DeviceIDs[0].Num())
+	{
+		cl_int ErrorCode;
+	
+		//!< コマンドキュー作成
+		//!< Create command queue
+		CommandQueue = clCreateCommandQueue(Contexts[0], DeviceIDs[0][0], 0, &ErrorCode);
+		if (CL_SUCCESS == ErrorCode)
+		{
+		}
+	}
+	return CommandQueue;
+}
+
+cl_mem UOpenCLComponent::CreateBuffer(const size_t Size, const cl_mem_flags MemFlags)
+{
+	cl_mem Buffer = nullptr;
+	if (0 < Contexts.Num())
+	{
+		cl_int ErrorCode;
+
+		//!< GPU 上へメモリ確保
+		//!< Allocate memory on GPU
+		Buffer = clCreateBuffer(Contexts[0], MemFlags, Size, nullptr, &ErrorCode);
+		if (CL_SUCCESS == ErrorCode)
+		{
+		}
+	}
+	return Buffer;
+}
+cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size_t Width, const size_t Height, const size_t Pitch, const cl_mem_flags MemFlags)
+{
+	cl_mem Buffer = nullptr;
+	if (0 < Contexts.Num())
+	{
+		cl_int ErrorCode;
+
+		clCreateImage2D(Contexts[0], MemFlags, Format, Width, Height, Pitch, nullptr, &ErrorCode);
+		if (CL_SUCCESS == ErrorCode)
+		{
+		}
+	}
+	return Buffer;
+}
+
+cl_int UOpenCLComponent::EnqueueWriteBuffer(const cl_command_queue CommandQueue, const cl_mem Buffer, const size_t Size, const void* InData, const size_t Offset, const cl_bool Blocking)
+{
+	//!< GPU へデータ転送 (コマンドキュー)
+	//!< Send data to GPU (CommandQueue)
+	return clEnqueueWriteBuffer(CommandQueue, Buffer, Blocking, Offset, Size, InData, 0, nullptr, nullptr);
+}
+cl_int UOpenCLComponent::EnqueueReadBuffer(const cl_command_queue CommandQueue, const cl_mem Buffer, const size_t Size, void* OutData, const size_t Offset, const cl_bool Blocking)
+{
+	//!< 結果の取得
+	//!< Get result
+	return clEnqueueReadBuffer(CommandQueue, Buffer, Blocking, Offset, Size, OutData, 0, nullptr, nullptr);
+}
+cl_int UOpenCLComponent::EnqueueWriteImage(const cl_command_queue CommandQueue, const cl_mem Buffer, const size_t* Origin, const size_t* Region, const size_t RowPitch, const size_t SlicePitch, const void* InData, const cl_bool Blocking)
+{
+	return clEnqueueWriteImage(CommandQueue, Buffer, Blocking, Origin, Region, RowPitch, SlicePitch, InData, 0, nullptr, nullptr);
+}
+cl_int UOpenCLComponent::EnqueueReadImage(const cl_command_queue CommandQueue, const cl_mem Buffer, const size_t* Origin, const size_t* Region, const size_t RowPitch, const size_t SlicePitch, void* OutData, const cl_bool Blocking)
+{
+	return clEnqueueReadImage(CommandQueue, Buffer, Blocking, Origin, Region, RowPitch, SlicePitch, OutData, 0, nullptr, nullptr);
+}
+
+cl_int UOpenCLComponent::SetKernelArg(const cl_kernel Kernel, const cl_uint Index, const cl_mem Buffer)
+{
+	//!< カーネル引数の設定
+	//!< Arguments of kernel
+	return clSetKernelArg(Kernel, Index, sizeof(Buffer), &Buffer);
+}
+cl_int UOpenCLComponent::EnqueueTask(const cl_command_queue CommandQueue, const cl_kernel Kernel)
+{
+	//!< カーネルの実行
+	//!< Execute kernel
+#if 0
+	return clEnqueueTask(CommandQueue, Kernel, 0, nullptr, nullptr);
+#else
+	const cl_uint WorkDim = 1;
+	const size_t GlobalWorkOffset = 0;
+	const size_t GlobalWork = 10;
+	const size_t LocalWork = 1;
+	return clEnqueueNDRangeKernel(CommandQueue, Kernel, WorkDim, &GlobalWorkOffset, &GlobalWork, &LocalWork, 0, nullptr, nullptr);
+#endif
+}
