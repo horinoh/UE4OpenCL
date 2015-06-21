@@ -89,16 +89,32 @@ cl_kernel UOpenCLComponent::CreateKernel(const class UOpenCLCode& CodeAsset, con
 		cl_int ErrorCode;
 
 		const char* AnsiCode = TCHAR_TO_ANSI(*CodeAsset.Code);
-		const size_t Length = CodeAsset.Code.Len();
+		//const size_t Length = CodeAsset.Code.Len();
+		const size_t Length = strlen(AnsiCode);
 		const auto Program = clCreateProgramWithSource(Contexts[0], 1, &AnsiCode, &Length, &ErrorCode);
 		if (CL_SUCCESS == ErrorCode)
 		{
-			if (CL_SUCCESS == clBuildProgram(Program, DeviceIDs[0].Num(), &DeviceIDs[0][0], nullptr, nullptr, nullptr))
+			ErrorCode = clBuildProgram(Program, DeviceIDs[0].Num(), &DeviceIDs[0][0], nullptr, nullptr, nullptr);
+			if (CL_SUCCESS == ErrorCode)
 			{
 				Kernel = clCreateKernel(Program, TCHAR_TO_ANSI(*KernelName), &ErrorCode);
 				if (CL_SUCCESS == ErrorCode)
 				{
 				}
+			}
+			else if (CL_BUILD_PROGRAM_FAILURE == ErrorCode)
+			{
+				size_t Size;
+				if (CL_SUCCESS == clGetProgramBuildInfo(Program, DeviceIDs[0][0], CL_PROGRAM_BUILD_LOG, 0, nullptr, &Size))
+				{
+					char* Log = new char[Size];
+					if (CL_SUCCESS == clGetProgramBuildInfo(Program, DeviceIDs[0][0], CL_PROGRAM_BUILD_LOG, Size, Log, nullptr))
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString(ANSI_TO_TCHAR(Log)));
+					}
+					delete[] Log;
+				}
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("CL_BUILD_PROGRAM_FAILURE"));
 			}
 			clReleaseProgram(Program);
 		}
@@ -149,6 +165,7 @@ cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size
 		clCreateImage2D(Contexts[0], MemFlags, Format, Width, Height, Pitch, nullptr, &ErrorCode);
 		if (CL_SUCCESS == ErrorCode)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("AA"));
 		}
 	}
 	return Buffer;
@@ -194,4 +211,8 @@ cl_int UOpenCLComponent::EnqueueTask(const cl_command_queue CommandQueue, const 
 	const size_t LocalWork = 1;
 	return clEnqueueNDRangeKernel(CommandQueue, Kernel, WorkDim, &GlobalWorkOffset, &GlobalWork, &LocalWork, 0, nullptr, nullptr);
 #endif
+}
+cl_int UOpenCLComponent::EnqueueNDRangeKernel(const cl_command_queue CommandQueue, const cl_kernel Kernel, const cl_uint WorkDim, const size_t GlobalWork, const size_t LocalWork, const size_t GlobalWorkOffset)
+{
+	return clEnqueueNDRangeKernel(CommandQueue, Kernel, WorkDim, &GlobalWorkOffset, &GlobalWork, &LocalWork, 0, nullptr, nullptr);
 }
