@@ -23,4 +23,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = OpenCL)
 	class UOpenCLCode* OpenCLCode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Texture)
+	UTexture2D* Texture2D;
+	TArray<FColor> Colors;
 };

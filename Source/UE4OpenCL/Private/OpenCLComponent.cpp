@@ -4,6 +4,7 @@
 #include "OpenCLComponent.h"
 
 #include "OpenCLCode.h"
+#include <string>
 
 // Sets default values for this component's properties
 UOpenCLComponent::UOpenCLComponent()
@@ -21,7 +22,7 @@ void UOpenCLComponent::OnComponentCreated()
 {
 	Super::OnComponentCreated();
 
-	//!< プラットホームID、デバイスIDの列挙とコンテキストの作成
+	//!< プラットフォームID、デバイスIDの列挙とコンテキストの作成
 	//!< Enumerate platformIDs, deviceIDs and create context
 	cl_uint PlatformNum;
 	if (CL_SUCCESS == clGetPlatformIDs(0, nullptr, &PlatformNum) && 0 < PlatformNum)
@@ -88,10 +89,10 @@ cl_kernel UOpenCLComponent::CreateKernel(const class UOpenCLCode& CodeAsset, con
 	{
 		cl_int ErrorCode;
 
-		const char* AnsiCode = TCHAR_TO_ANSI(*CodeAsset.Code);
-		//const size_t Length = CodeAsset.Code.Len();
-		const size_t Length = strlen(AnsiCode);
-		const auto Program = clCreateProgramWithSource(Contexts[0], 1, &AnsiCode, &Length, &ErrorCode);
+		const auto String = std::string(TCHAR_TO_UTF8(*CodeAsset.Code));
+		const auto* CStr = String.c_str();
+		const size_t Length = CodeAsset.Code.Len();
+		const auto Program = clCreateProgramWithSource(Contexts[0], 1, &CStr, &Length, &ErrorCode);
 		if (CL_SUCCESS == ErrorCode)
 		{
 			ErrorCode = clBuildProgram(Program, DeviceIDs[0].Num(), &DeviceIDs[0][0], nullptr, nullptr, nullptr);
@@ -114,9 +115,12 @@ cl_kernel UOpenCLComponent::CreateKernel(const class UOpenCLCode& CodeAsset, con
 					}
 					delete[] Log;
 				}
-				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("CL_BUILD_PROGRAM_FAILURE"));
 			}
 			clReleaseProgram(Program);
+		}
+		else if (CL_INVALID_VALUE == ErrorCode)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, CodeAsset.Code);
 		}
 	}
 	return Kernel;
@@ -162,10 +166,9 @@ cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size
 	{
 		cl_int ErrorCode;
 
-		clCreateImage2D(Contexts[0], MemFlags, Format, Width, Height, Pitch, nullptr, &ErrorCode);
+		Buffer = clCreateImage2D(Contexts[0], MemFlags, Format, Width, Height, Pitch, nullptr, &ErrorCode);
 		if (CL_SUCCESS == ErrorCode)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("AA"));
 		}
 	}
 	return Buffer;
@@ -202,17 +205,9 @@ cl_int UOpenCLComponent::EnqueueTask(const cl_command_queue CommandQueue, const 
 {
 	//!< カーネルの実行
 	//!< Execute kernel
-#if 0
 	return clEnqueueTask(CommandQueue, Kernel, 0, nullptr, nullptr);
-#else
-	const cl_uint WorkDim = 1;
-	const size_t GlobalWorkOffset = 0;
-	const size_t GlobalWork = 10;
-	const size_t LocalWork = 1;
-	return clEnqueueNDRangeKernel(CommandQueue, Kernel, WorkDim, &GlobalWorkOffset, &GlobalWork, &LocalWork, 0, nullptr, nullptr);
-#endif
 }
-cl_int UOpenCLComponent::EnqueueNDRangeKernel(const cl_command_queue CommandQueue, const cl_kernel Kernel, const cl_uint WorkDim, const size_t GlobalWork, const size_t LocalWork, const size_t GlobalWorkOffset)
+cl_int UOpenCLComponent::EnqueueNDRangeKernel(const cl_command_queue CommandQueue, const cl_kernel Kernel, const cl_uint WorkDim, const size_t* GlobalWork, const size_t* LocalWork, const size_t* GlobalWorkOffset)
 {
-	return clEnqueueNDRangeKernel(CommandQueue, Kernel, WorkDim, &GlobalWorkOffset, &GlobalWork, &LocalWork, 0, nullptr, nullptr);
+	return clEnqueueNDRangeKernel(CommandQueue, Kernel, WorkDim, GlobalWorkOffset, GlobalWork, LocalWork, 0, nullptr, nullptr);
 }
