@@ -43,7 +43,4 @@ public:
 	TArray<cl_platform_id> PlatformIDs;
 	TArray<TArray<cl_device_id>> DeviceIDs;
 	TArray<cl_context> Contexts;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Texture)
-	//class UTexture2D* Texture2D;
 };

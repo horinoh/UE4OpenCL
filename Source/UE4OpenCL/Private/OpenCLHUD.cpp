@@ -17,7 +17,10 @@ AOpenCLHUD::AOpenCLHUD(const FObjectInitializer& ObjectInitializer)
 	}
 
 	Texture2D = UTexture2D::CreateTransient(256, 256);
-	Texture2D->UpdateResource();
+	if (nullptr != Texture2D)
+	{
+		Texture2D->UpdateResource();
+	}
 }
 
 void AOpenCLHUD::DrawHUD()
