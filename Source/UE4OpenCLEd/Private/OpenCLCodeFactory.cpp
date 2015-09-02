@@ -3,9 +3,10 @@
 #include "UE4OpenCLEd.h"
 #include "OpenCLCodeFactory.h"
 
-#include "OpenCLCode.h"
-
+#include "Editor.h"
 #include "EditorFramework/AssetImportData.h"
+
+#include "OpenCLCode.h"
 
 UOpenCLCodeFactory::UOpenCLCodeFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -35,22 +36,30 @@ UObject* UOpenCLCodeFactory::FactoryCreateNew(UClass* InClass, UObject* InParent
 
 UObject* UOpenCLCodeFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
 {
+	FEditorDelegates::OnAssetPreImport.Broadcast(this, InClass, InParent, InName, Type);
+
 	auto NewAsset = NewObject<UOpenCLCode>(InParent, InName, Flags);
 	if (nullptr != NewAsset)
 	{
 		NewAsset->Code = FString(Buffer);
-
+	
 		if (nullptr == NewAsset->AssetImportData)
 		{
 			NewAsset->AssetImportData = NewObject<UAssetImportData>(NewAsset);
 		}
+	
 		if (nullptr != NewAsset->AssetImportData)
 		{
-			NewAsset->AssetImportData->SourceFilePath = FReimportManager::SanitizeImportFilename(CurrentFilename, NewAsset);
-			NewAsset->AssetImportData->SourceFileTimestamp = IFileManager::Get().GetTimeStamp(*CurrentFilename).ToString();
-			NewAsset->AssetImportData->bDirty = false;
+			NewAsset->AssetImportData->Update(CurrentFilename);
+			
+			NewAsset->AssetImportData->SourceData.SourceFiles.Add(FAssetImportInfo::FSourceFile(CurrentFilename));
+			NewAsset->AssetImportData->SourceData.SourceFiles.Last().Timestamp = IFileManager::Get().GetTimeStamp(*CurrentFilename);
+			NewAsset->AssetImportData->Modify(false);
 		}
 	}
+
+	FEditorDelegates::OnAssetPostImport.Broadcast(this, NewAsset);
+
 	return NewAsset;
 }
 
@@ -61,7 +70,7 @@ bool UOpenCLCodeFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames
 	{
 		if (nullptr != Asset->AssetImportData)
 		{
-			OutFilenames.Add(FReimportManager::ResolveImportFilename(Asset->AssetImportData->SourceFilePath, Asset));
+			Asset->AssetImportData->ExtractFilenames(OutFilenames);
 			return true;
 		}
 	}
@@ -73,9 +82,12 @@ void UOpenCLCodeFactory::SetReimportPaths(UObject* Obj, const TArray<FString>& N
 	const auto Asset = Cast<UOpenCLCode>(Obj);
 	if (nullptr != Asset)
 	{
-		if (ensure(1 == NewReimportPaths.Num()))
+		if (nullptr != Asset->AssetImportData)
 		{
-			Asset->AssetImportData->SourceFilePath = FReimportManager::ResolveImportFilename(NewReimportPaths[0], Asset);
+			if (ensure(1 == NewReimportPaths.Num()))
+			{
+				Asset->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
+			}
 		}
 	}
 }
@@ -85,22 +97,27 @@ EReimportResult::Type UOpenCLCodeFactory::Reimport(UObject* Obj)
 	const auto Asset = Cast<UOpenCLCode>(Obj);
 	if (nullptr != Asset)
 	{
-		const auto FileName = FReimportManager::ResolveImportFilename(Asset->AssetImportData->SourceFilePath, Asset);
-		if (FileName.Len())
+		if (nullptr != Asset->AssetImportData)
 		{
-			if (INDEX_NONE != IFileManager::Get().FileSize(*FileName))
+			const auto Filename = Asset->AssetImportData->GetFirstFilename();
+			if (Filename.Len())
 			{
-				if (UFactory::StaticImportObject(Asset->GetClass(), Asset->GetOuter(), *Asset->GetName(), RF_Public | RF_Standalone, *FileName, nullptr, this))
+				if (INDEX_NONE != IFileManager::Get().FileSize(*Filename))
 				{
-					if (Asset->GetOuter())
+					if (UFactory::StaticImportObject(Asset->GetClass(), Asset->GetOuter(), *Asset->GetName(), RF_Public | RF_Standalone, *Filename, nullptr, this))
 					{
-						Asset->GetOuter()->MarkPackageDirty();
+						Asset->AssetImportData->Update(Filename);
+
+						if (Asset->GetOuter())
+						{
+							Asset->GetOuter()->MarkPackageDirty();
+						}
+						else
+						{
+							Asset->MarkPackageDirty();
+						}
+						return EReimportResult::Succeeded;
 					}
-					else
-					{
-						Asset->MarkPackageDirty();
-					}
-					return EReimportResult::Succeeded;
 				}
 			}
 		}
