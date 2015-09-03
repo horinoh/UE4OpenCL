@@ -14,11 +14,14 @@ class UE4OPENCL_API UOpenCLCode : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = OpenCL)
+	//!< UObject
+	virtual void PostInitProperties() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = OpenCL)
 	FString Code;
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, Instanced, Category = Reimport)
+	UPROPERTY(VisibleAnywhere, Instanced, Category = Reimport)
 	class UAssetImportData* AssetImportData;
 #endif
 };

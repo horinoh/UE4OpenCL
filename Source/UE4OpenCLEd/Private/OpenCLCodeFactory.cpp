@@ -43,18 +43,9 @@ UObject* UOpenCLCodeFactory::FactoryCreateText(UClass* InClass, UObject* InParen
 	{
 		NewAsset->Code = FString(Buffer);
 	
-		if (nullptr == NewAsset->AssetImportData)
-		{
-			NewAsset->AssetImportData = NewObject<UAssetImportData>(NewAsset);
-		}
-	
 		if (nullptr != NewAsset->AssetImportData)
 		{
 			NewAsset->AssetImportData->Update(CurrentFilename);
-			
-			NewAsset->AssetImportData->SourceData.SourceFiles.Add(FAssetImportInfo::FSourceFile(CurrentFilename));
-			NewAsset->AssetImportData->SourceData.SourceFiles.Last().Timestamp = IFileManager::Get().GetTimeStamp(*CurrentFilename);
-			NewAsset->AssetImportData->Modify(false);
 		}
 	}
 
@@ -70,6 +61,7 @@ bool UOpenCLCodeFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames
 	{
 		if (nullptr != Asset->AssetImportData)
 		{
+			//!< AssetImportData->SourceData.SourceFiles を参照して返している
 			Asset->AssetImportData->ExtractFilenames(OutFilenames);
 			return true;
 		}
@@ -86,6 +78,7 @@ void UOpenCLCodeFactory::SetReimportPaths(UObject* Obj, const TArray<FString>& N
 		{
 			if (ensure(1 == NewReimportPaths.Num()))
 			{
+				//!< AssetImportData->SourceData.SourceFiles[0] へセットしている、タイムスタンプは更新しない
 				Asset->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
 			}
 		}
@@ -99,6 +92,7 @@ EReimportResult::Type UOpenCLCodeFactory::Reimport(UObject* Obj)
 	{
 		if (nullptr != Asset->AssetImportData)
 		{
+			//!< AssetImportData->SourceData.SourceFiles[0] を参照して返している
 			const auto Filename = Asset->AssetImportData->GetFirstFilename();
 			if (Filename.Len())
 			{
@@ -106,6 +100,7 @@ EReimportResult::Type UOpenCLCodeFactory::Reimport(UObject* Obj)
 				{
 					if (UFactory::StaticImportObject(Asset->GetClass(), Asset->GetOuter(), *Asset->GetName(), RF_Public | RF_Standalone, *Filename, nullptr, this))
 					{
+						//!< 指定されたファイルを用いて更新する
 						Asset->AssetImportData->Update(Filename);
 
 						if (Asset->GetOuter())

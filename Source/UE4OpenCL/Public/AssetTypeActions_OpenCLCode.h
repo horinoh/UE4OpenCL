@@ -11,6 +11,8 @@
 class UE4OPENCL_API FAssetTypeActions_OpenCLCode : public FAssetTypeActions_Base
 {
 public:
+	typedef FAssetTypeActions_Base Super;
+
 	virtual FText GetName() const override { return NSLOCTEXT("AssetTypeActions", "OpenCLCodeAssetTypeActions", "OpenCLCodeAsset"); }
 	virtual FColor GetTypeColor() const override { return FColor::White; }
 	virtual UClass* GetSupportedClass() const override;
@@ -20,4 +22,6 @@ public:
 	//virtual bool HasActions(const TArray<UObject*>& InObjects) const override { return true; }
 	//virtual void GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder) override;
 	//void MyCustomAction(TArray<TWeakObjectPtr<class UMyCustomAsset>> Objects);
+
+	//virtual void OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor = TSharedPtr<IToolkitHost>()) override;
 };

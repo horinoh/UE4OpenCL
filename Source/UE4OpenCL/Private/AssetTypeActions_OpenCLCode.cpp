@@ -13,3 +13,8 @@ UClass* FAssetTypeActions_OpenCLCode::GetSupportedClass() const
 //void FAssetTypeActions_OpenCLCode::GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder)
 //{
 //}
+
+//void FAssetTypeActions_OpenCLCode::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor)
+//{
+//	Super::OpenAssetEditor(InObjects, EditWithinLevelEditor);
+//}
