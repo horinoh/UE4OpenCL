@@ -11,7 +11,7 @@ AOpenCLHUD::AOpenCLHUD(const FObjectInitializer& ObjectInitializer)
 {
 	OpenCLComp = ObjectInitializer.CreateDefaultSubobject<UOpenCLComponent>(this, TEXT("OpenCLComp"));
 	static ConstructorHelpers::FObjectFinder<UOpenCLCode> Code(TEXT("OpenCLCode'/Game/OpenCLCode.OpenCLCode'"));
-	if (nullptr != Code.Object)
+	if (Code.Succeeded())
 	{
 		OpenCLCode = Code.Object;
 	}
