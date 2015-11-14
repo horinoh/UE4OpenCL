@@ -166,7 +166,24 @@ cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size
 	{
 		cl_int ErrorCode;
 
+#if 0
+		//!< clCreateImage() ‚ÍŽg‚¦‚È‚¢‚Á‚Û‚¢?
+		//!< https://devtalk.nvidia.com/default/topic/893563/cuda-setup-and-installation/problems-using-opencl-from-cuda-toolkit-7-5/
+		cl_image_desc ImageDesc;
+		ImageDesc.image_type = CL_MEM_OBJECT_IMAGE2D;
+		ImageDesc.image_width = Width;
+		ImageDesc.image_height = Height;
+		ImageDesc.image_depth = 0;		//!< 3D‚Ìê‡‚Ì‚Ý
+		ImageDesc.image_array_size = 0; //!< ”z—ñ‚Ìê‡‚Ì‚Ý
+		ImageDesc.image_row_pitch = Pitch;
+		ImageDesc.image_slice_pitch = 0;
+		ImageDesc.num_mip_levels = 0;	//!< 0‚Ì‚Ý
+		ImageDesc.num_samples = 0;		//!< 0‚Ì‚Ý
+		ImageDesc.buffer = nullptr;
+		Buffer = clCreateImage(Contexts[0], MemFlags, Format, &ImageDesc, nullptr, &ErrorCode);
+#else
 		Buffer = clCreateImage2D(Contexts[0], MemFlags, Format, Width, Height, Pitch, nullptr, &ErrorCode);
+#endif
 		if (CL_SUCCESS == ErrorCode)
 		{
 		}
