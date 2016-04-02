@@ -17,7 +17,7 @@ public:
 	UOpenCLComponent();
 
 	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
 	// Called when the game starts
 	virtual void BeginPlay() override;

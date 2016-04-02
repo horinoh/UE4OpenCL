@@ -53,9 +53,9 @@ void UOpenCLComponent::OnComponentCreated()
 		}
 	}
 }
-void UOpenCLComponent::OnComponentDestroyed()
+void UOpenCLComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	Super::OnComponentDestroyed();
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
 
 	for (auto i : Contexts)
 	{
@@ -166,9 +166,10 @@ cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size
 	{
 		cl_int ErrorCode;
 
-#if 0
+#if 1
 		//!< clCreateImage() ‚ÍŽg‚¦‚È‚¢‚Á‚Û‚¢?
 		//!< https://devtalk.nvidia.com/default/topic/893563/cuda-setup-and-installation/problems-using-opencl-from-cuda-toolkit-7-5/
+		//!< ª ‚È‚ñ‚©‚¢‚¯‚é‚æ‚¤‚É‚È‚Á‚½‚Ý‚½‚¢‚È‚Ì‚Å—LŒø‚É‚µ‚½ (2016/4/2)
 		cl_image_desc ImageDesc;
 		ImageDesc.image_type = CL_MEM_OBJECT_IMAGE2D;
 		ImageDesc.image_width = Width;
