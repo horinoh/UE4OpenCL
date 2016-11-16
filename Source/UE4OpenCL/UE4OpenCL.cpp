@@ -8,6 +8,13 @@ class FOpenCLGameModuleImpl : public FDefaultGameModuleImpl
 {
 	virtual void StartupModule() override
 	{
+		const auto DllRoot = FPaths::GameContentDir() / TEXT("../ThirdParty/OpenCL/");
+		FPlatformProcess::PushDllDirectory(*DllRoot);
+		{
+			DllHandles.Add(FPlatformProcess::GetDllHandle(*(DllRoot + "OpenCL64.dll")));
+		}
+		FPlatformProcess::PopDllDirectory(*DllRoot);
+
 		AssetTypeActions = MakeShareable(new FAssetTypeActions_OpenCLCode());
 		FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools")).Get().RegisterAssetTypeActions(AssetTypeActions.ToSharedRef());
 	}
@@ -22,6 +29,7 @@ class FOpenCLGameModuleImpl : public FDefaultGameModuleImpl
 			AssetTypeActions.Reset();
 		}
 	}
+	TArray<void*> DllHandles;
 	TSharedPtr<FAssetTypeActions_OpenCLCode> AssetTypeActions;
 };
 

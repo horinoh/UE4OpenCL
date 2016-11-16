@@ -40,7 +40,8 @@ public class UE4OpenCL : ModuleRules
 			PublicLibraryPaths.Add(LibPath);
 
 			PublicAdditionalLibraries.Add(Path.Combine(LibPath, "OpenCL.lib"));
-			PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
+            PublicDelayLoadDLLs.Add("OpenCL64.dll");
+            PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
 		}
 	}
 }
