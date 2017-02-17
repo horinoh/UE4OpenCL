@@ -35,7 +35,8 @@ public class UE4OpenCL : ModuleRules
 			var ThirdPartyPath = Path.GetFullPath(Path.Combine(ModulePath, "..", "..", "ThirdParty"));
 
             //var Name = Path.Combine("CUDA", "v7.0");
-            var Name = Path.Combine("CUDA", "v7.5");
+            //var Name = Path.Combine("CUDA", "v7.5");
+            var Name = Path.Combine("CUDA", "v8.0");
             var LibPath = Path.Combine(ThirdPartyPath, Name, "lib", "x64");
 			PublicLibraryPaths.Add(LibPath);
 
