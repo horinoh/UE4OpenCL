@@ -5,21 +5,10 @@ using System.Collections.Generic;
 
 public class UE4OpenCLTarget : TargetRules
 {
-	public UE4OpenCLTarget(TargetInfo Target)
+	public UE4OpenCLTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-	}
 
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "UE4OpenCL" } );
+		ExtraModuleNames.Add("UE4OpenCL");
 	}
 }

@@ -11,10 +11,18 @@ copy C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64\OpenCL.lib 
 ~~~
 -->
 
+<!--
 ~~~
 copy C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include\CL\*.h UE4OpenCL\ThirdParty\CUDA\v7.5\include\CL\
 copy C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64\OpenCL.lib UE4OpenCL\ThirdParty\CUDA\v7.5\lib\x64\
-//copy C:\Program Files\NVIDIA Corporation\OpenCL\OpenCL64.dll UE4OpenCL\ThirdParty\OpenCL\
+copy C:\Program Files\NVIDIA Corporation\OpenCL\OpenCL64.dll UE4OpenCL\ThirdParty\OpenCL\
+~~~
+-->
+
+~~~
+copy C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include\CL\*.h UE4OpenCL\ThirdParty\CUDA\v8.0\include\CL\
+copy C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\OpenCL.lib UE4OpenCL\ThirdParty\CUDA\v8.0\lib\x64\
+copy C:\Program Files\NVIDIA Corporation\OpenCL\OpenCL64.dll UE4OpenCL\ThirdParty\OpenCL\
 ~~~
 
 * .uproject を右クリック(right click .uproject) → Generate Visual Studio project files → .sln を開いてビルド (open .sln and build)

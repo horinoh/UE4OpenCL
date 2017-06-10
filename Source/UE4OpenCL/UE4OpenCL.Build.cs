@@ -5,7 +5,7 @@ using System.IO;
 
 public class UE4OpenCL : ModuleRules
 {
-	public UE4OpenCL(TargetInfo Target)
+	public UE4OpenCL(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",
 															"RHI", "RenderCore", 

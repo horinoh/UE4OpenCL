@@ -4,7 +4,7 @@ namespace UnrealBuildTool.Rules
 {
 	public class UE4OpenCLEd : ModuleRules
 	{
-		public UE4OpenCLEd(TargetInfo Target)
+		public UE4OpenCLEd(ReadOnlyTargetRules Target) : base(Target)
 		{
 			PublicIncludePaths.AddRange(
 				new string[] {
