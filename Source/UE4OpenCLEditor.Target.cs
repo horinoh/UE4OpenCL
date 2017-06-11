@@ -9,7 +9,6 @@ public class UE4OpenCLEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.Add("UE4OpenCL");
-		ExtraModuleNames.Add("UE4OpenCLEd");
+		ExtraModuleNames.AddRange(new string[] { "UE4OpenCL", "UE4OpenCLEd" });
 	}
 }
