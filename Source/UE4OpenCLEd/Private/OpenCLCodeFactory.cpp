@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4OpenCLEd.h"
 #include "OpenCLCodeFactory.h"
@@ -61,7 +61,7 @@ bool UOpenCLCodeFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames
 	{
 		if (nullptr != Asset->AssetImportData)
 		{
-			//!< AssetImportData->SourceData.SourceFiles ‚ğQÆ‚µ‚Ä•Ô‚µ‚Ä‚¢‚é
+			//!< AssetImportData->SourceData.SourceFiles ã‚’å‚ç…§ã—ã¦è¿”ã—ã¦ã„ã‚‹
 			Asset->AssetImportData->ExtractFilenames(OutFilenames);
 			return true;
 		}
@@ -78,7 +78,7 @@ void UOpenCLCodeFactory::SetReimportPaths(UObject* Obj, const TArray<FString>& N
 		{
 			if (ensure(1 == NewReimportPaths.Num()))
 			{
-				//!< AssetImportData->SourceData.SourceFiles[0] ‚ÖƒZƒbƒg‚µ‚Ä‚¢‚éAƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ÍXV‚µ‚È‚¢
+				//!< AssetImportData->SourceData.SourceFiles[0] ã¸ã‚»ãƒƒãƒˆã—ã¦ã„ã‚‹ã€ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã¯æ›´æ–°ã—ãªã„
 				Asset->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
 			}
 		}
@@ -92,7 +92,7 @@ EReimportResult::Type UOpenCLCodeFactory::Reimport(UObject* Obj)
 	{
 		if (nullptr != Asset->AssetImportData)
 		{
-			//!< AssetImportData->SourceData.SourceFiles[0] ‚ğQÆ‚µ‚Ä•Ô‚µ‚Ä‚¢‚é
+			//!< AssetImportData->SourceData.SourceFiles[0] ã‚’å‚ç…§ã—ã¦è¿”ã—ã¦ã„ã‚‹
 			const auto Filename = Asset->AssetImportData->GetFirstFilename();
 			if (Filename.Len())
 			{
@@ -100,7 +100,7 @@ EReimportResult::Type UOpenCLCodeFactory::Reimport(UObject* Obj)
 				{
 					if (UFactory::StaticImportObject(Asset->GetClass(), Asset->GetOuter(), *Asset->GetName(), RF_Public | RF_Standalone, *Filename, nullptr, this))
 					{
-						//!< w’è‚³‚ê‚½ƒtƒ@ƒCƒ‹‚ğ—p‚¢‚ÄXV‚·‚é
+						//!< æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç”¨ã„ã¦æ›´æ–°ã™ã‚‹
 						Asset->AssetImportData->Update(Filename);
 
 						if (Asset->GetOuter())

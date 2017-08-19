@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4OpenCL.h"
 #include "OpenCLComponent.h"
@@ -21,7 +21,7 @@ void UOpenCLComponent::OnComponentCreated()
 {
 	Super::OnComponentCreated();
 
-	//!< ƒvƒ‰ƒbƒgƒtƒH[ƒ€IDAƒfƒoƒCƒXID‚Ì—ñ‹“‚ÆƒRƒ“ƒeƒLƒXƒg‚Ìì¬
+	//!< ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ IDã€ãƒ‡ãƒã‚¤ã‚¹IDã®åˆ—æŒ™ã¨ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ä½œæˆ
 	//!< Enumerate platformIDs, deviceIDs and create context
 	cl_uint PlatformNum;
 	if (CL_SUCCESS == clGetPlatformIDs(0, nullptr, &PlatformNum) && 0 < PlatformNum)
@@ -82,7 +82,7 @@ void UOpenCLComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAct
 cl_kernel UOpenCLComponent::CreateKernel(const class UOpenCLCode& CodeAsset, const FString KernelName)
 {
 	cl_kernel Kernel = nullptr;
-	//!< OpenCL ƒR[ƒh‚Ì“Ç‚Ýž‚ÝAƒrƒ‹ƒh(‚±‚±‚Å‚ÍÅ‰‚ÌƒRƒ“ƒeƒLƒXƒg‚ðŽg—p)
+	//!< OpenCL ã‚³ãƒ¼ãƒ‰ã®èª­ã¿è¾¼ã¿ã€ãƒ“ãƒ«ãƒ‰(ã“ã“ã§ã¯æœ€åˆã®ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’ä½¿ç”¨)
 	//!< Load OpenCL code, build(using first context here)
 	if (0 < Contexts.Num() && 0 < DeviceIDs[0].Num())
 	{
@@ -132,7 +132,7 @@ cl_command_queue UOpenCLComponent::CreateCommandQueue()
 	{
 		cl_int ErrorCode;
 	
-		//!< ƒRƒ}ƒ“ƒhƒLƒ…[ì¬
+		//!< ã‚³ãƒžãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ä½œæˆ
 		//!< Create command queue
 		CommandQueue = clCreateCommandQueue(Contexts[0], DeviceIDs[0][0], 0, &ErrorCode);
 		if (CL_SUCCESS == ErrorCode)
@@ -149,7 +149,7 @@ cl_mem UOpenCLComponent::CreateBuffer(const size_t Size, const cl_mem_flags MemF
 	{
 		cl_int ErrorCode;
 
-		//!< GPU ã‚Öƒƒ‚ƒŠŠm•Û
+		//!< GPU ä¸Šã¸ãƒ¡ãƒ¢ãƒªç¢ºä¿
 		//!< Allocate memory on GPU
 		Buffer = clCreateBuffer(Contexts[0], MemFlags, Size, nullptr, &ErrorCode);
 		if (CL_SUCCESS == ErrorCode)
@@ -166,19 +166,19 @@ cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size
 		cl_int ErrorCode;
 
 #if 1
-		//!< clCreateImage() ‚ÍŽg‚¦‚È‚¢‚Á‚Û‚¢?
+		//!< clCreateImage() ã¯ä½¿ãˆãªã„ã£ã½ã„?
 		//!< https://devtalk.nvidia.com/default/topic/893563/cuda-setup-and-installation/problems-using-opencl-from-cuda-toolkit-7-5/
-		//!< ª ‚È‚ñ‚©‚¢‚¯‚é‚æ‚¤‚É‚È‚Á‚½‚Ý‚½‚¢‚È‚Ì‚Å—LŒø‚É‚µ‚½ (2016/4/2)
+		//!< â†‘ ãªã‚“ã‹ã„ã‘ã‚‹ã‚ˆã†ã«ãªã£ãŸã¿ãŸã„ãªã®ã§æœ‰åŠ¹ã«ã—ãŸ (2016/4/2)
 		cl_image_desc ImageDesc;
 		ImageDesc.image_type = CL_MEM_OBJECT_IMAGE2D;
 		ImageDesc.image_width = Width;
 		ImageDesc.image_height = Height;
-		ImageDesc.image_depth = 0;		//!< 3D‚Ìê‡‚Ì‚Ý
-		ImageDesc.image_array_size = 0; //!< ”z—ñ‚Ìê‡‚Ì‚Ý
+		ImageDesc.image_depth = 0;		//!< 3Dã®å ´åˆã®ã¿
+		ImageDesc.image_array_size = 0; //!< é…åˆ—ã®å ´åˆã®ã¿
 		ImageDesc.image_row_pitch = Pitch;
 		ImageDesc.image_slice_pitch = 0;
-		ImageDesc.num_mip_levels = 0;	//!< 0‚Ì‚Ý
-		ImageDesc.num_samples = 0;		//!< 0‚Ì‚Ý
+		ImageDesc.num_mip_levels = 0;	//!< 0ã®ã¿
+		ImageDesc.num_samples = 0;		//!< 0ã®ã¿
 		ImageDesc.buffer = nullptr;
 		Buffer = clCreateImage(Contexts[0], MemFlags, Format, &ImageDesc, nullptr, &ErrorCode);
 #else
@@ -193,13 +193,13 @@ cl_mem UOpenCLComponent::CreateImage2D(const cl_image_format* Format, const size
 
 cl_int UOpenCLComponent::EnqueueWriteBuffer(const cl_command_queue CommandQueue, const cl_mem Buffer, const size_t Size, const void* InData, const size_t Offset, const cl_bool Blocking)
 {
-	//!< GPU ‚Öƒf[ƒ^“]‘— (ƒRƒ}ƒ“ƒhƒLƒ…[)
+	//!< GPU ã¸ãƒ‡ãƒ¼ã‚¿è»¢é€ (ã‚³ãƒžãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼)
 	//!< Send data to GPU (CommandQueue)
 	return clEnqueueWriteBuffer(CommandQueue, Buffer, Blocking, Offset, Size, InData, 0, nullptr, nullptr);
 }
 cl_int UOpenCLComponent::EnqueueReadBuffer(const cl_command_queue CommandQueue, const cl_mem Buffer, const size_t Size, void* OutData, const size_t Offset, const cl_bool Blocking)
 {
-	//!< Œ‹‰Ê‚ÌŽæ“¾
+	//!< çµæžœã®å–å¾—
 	//!< Get result
 	return clEnqueueReadBuffer(CommandQueue, Buffer, Blocking, Offset, Size, OutData, 0, nullptr, nullptr);
 }
@@ -214,13 +214,13 @@ cl_int UOpenCLComponent::EnqueueReadImage(const cl_command_queue CommandQueue, c
 
 cl_int UOpenCLComponent::SetKernelArg(const cl_kernel Kernel, const cl_uint Index, const cl_mem Buffer)
 {
-	//!< ƒJ[ƒlƒ‹ˆø”‚ÌÝ’è
+	//!< ã‚«ãƒ¼ãƒãƒ«å¼•æ•°ã®è¨­å®š
 	//!< Arguments of kernel
 	return clSetKernelArg(Kernel, Index, sizeof(Buffer), &Buffer);
 }
 cl_int UOpenCLComponent::EnqueueTask(const cl_command_queue CommandQueue, const cl_kernel Kernel)
 {
-	//!< ƒJ[ƒlƒ‹‚ÌŽÀs
+	//!< ã‚«ãƒ¼ãƒãƒ«ã®å®Ÿè¡Œ
 	//!< Execute kernel
 	return clEnqueueTask(CommandQueue, Kernel, 0, nullptr, nullptr);
 }

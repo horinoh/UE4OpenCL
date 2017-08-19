@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UE4OpenCL.h"
 #include "OpenCLHUD.h"
@@ -29,17 +29,17 @@ void AOpenCLHUD::DrawHUD()
 
 	if (nullptr != Texture2D)
 	{
-		//!< ƒJ[ƒlƒ‹‚Ìì¬
+		//!< ã‚«ãƒ¼ãƒãƒ«ã®ä½œæˆ
 		//!< Create kernel
 		const auto Kernel = OpenCLComp->CreateKernel(*OpenCLCode, "main");
 		if (nullptr != Kernel)
 		{
-			//!< ƒRƒ}ƒ“ƒhƒLƒ…[ì¬
+			//!< ã‚³ãƒžãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ä½œæˆ
 			//!< Create command queue
 			const auto CommandQueue = OpenCLComp->CreateCommandQueue();
 			if (nullptr != CommandQueue)
 			{
-				//!< ƒCƒ[ƒWì¬
+				//!< ã‚¤ãƒ¡ãƒ¼ã‚¸ä½œæˆ
 				//!< Create image
 				const size_t Width = Texture2D->GetSizeX();
 				const size_t Height = Texture2D->GetSizeY();
@@ -49,11 +49,11 @@ void AOpenCLHUD::DrawHUD()
 				const auto Buffer = OpenCLComp->CreateImage2D(&Format, Width, Height, 0);
 				if (nullptr != Buffer)
 				{
-					//!< ƒJ[ƒlƒ‹ˆø”‚ÌÝ’è
+					//!< ã‚«ãƒ¼ãƒãƒ«å¼•æ•°ã®è¨­å®š
 					//!< Arguments of kernel
 					if (CL_SUCCESS == OpenCLComp->SetKernelArg(Kernel, 0, Buffer))
 					{
-						//!< ƒJ[ƒlƒ‹‚ÌŽÀs
+						//!< ã‚«ãƒ¼ãƒãƒ«ã®å®Ÿè¡Œ
 						//!< Execute kernel
 						const size_t GlobalWork[] = { Width, Height };
 						if (CL_SUCCESS == OpenCLComp->EnqueueNDRangeKernel(CommandQueue, Kernel, ARRAY_COUNT(GlobalWork), GlobalWork))
@@ -65,11 +65,11 @@ void AOpenCLHUD::DrawHUD()
 							const size_t RowPitch = Width * sizeof(Colors[0]);
 							const size_t SlicePitch = 0;
 
-							//!< Œ‹‰Ê‚ÌŽæ“¾
+							//!< çµæžœã®å–å¾—
 							//!< Get result
 							if (CL_SUCCESS == OpenCLComp->EnqueueReadImage(CommandQueue, Buffer, Origin, Region, RowPitch, SlicePitch, &Colors[0]))
 							{
-								//!< ƒeƒNƒXƒ`ƒƒ‚ðXV
+								//!< ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’æ›´æ–°
 								//!< Update texture
 								ENQUEUE_UNIQUE_RENDER_COMMAND_TWOPARAMETER(UpdateTexture2D,
 									AOpenCLHUD*, This, this,
@@ -82,7 +82,7 @@ void AOpenCLHUD::DrawHUD()
 									}
 								);
 
-								//!< ƒeƒNƒXƒ`ƒƒ‚ð•\Ž¦
+								//!< ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’è¡¨ç¤º
 								//!< Display texture
 								if (nullptr != Canvas)
 								{
