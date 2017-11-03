@@ -8,7 +8,7 @@ class FOpenCLGameModuleImpl : public FDefaultGameModuleImpl
 {
 	virtual void StartupModule() override
 	{
-		const auto DllRoot = FPaths::GameContentDir() / TEXT("../ThirdParty/OpenCL/");
+		const auto DllRoot = FPaths::ProjectContentDir() / TEXT("../ThirdParty/OpenCL/");
 		FPlatformProcess::PushDllDirectory(*DllRoot);
 		{
 			DllHandles.Add(FPlatformProcess::GetDllHandle(*(DllRoot + "OpenCL64.dll")));

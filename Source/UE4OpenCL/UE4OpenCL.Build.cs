@@ -2,6 +2,7 @@
 
 using UnrealBuildTool;
 using System.IO;
+using Tools.DotNETCommon;
 
 public class UE4OpenCL : ModuleRules
 {
