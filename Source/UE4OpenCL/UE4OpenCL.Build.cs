@@ -6,6 +6,11 @@ using Tools.DotNETCommon;
 
 public class UE4OpenCL : ModuleRules
 {
+	private string ThirdPartyPath
+    {
+        get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "ThirdParty")); }
+    }
+
 	public UE4OpenCL(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",
@@ -29,12 +34,6 @@ public class UE4OpenCL : ModuleRules
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-		 	FileReference FR;
-            UProjectInfo.TryGetProjectForTarget("UE4OpenCL", out FR);
-            RulesAssembly RA = RulesCompiler.CreateProjectRulesAssembly(FR);
-            var ModulePath = Path.GetDirectoryName(RA.GetModuleFileName(GetType().Name).CanonicalName);
-			var ThirdPartyPath = Path.GetFullPath(Path.Combine(ModulePath, "..", "..", "ThirdParty"));
-
             //var Name = Path.Combine("CUDA", "v7.0");
             //var Name = Path.Combine("CUDA", "v7.5");
             var Name = Path.Combine("CUDA", "v8.0");
