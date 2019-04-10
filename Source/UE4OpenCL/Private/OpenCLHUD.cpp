@@ -71,16 +71,14 @@ void AOpenCLHUD::DrawHUD()
 							{
 								//!< テクスチャを更新
 								//!< Update texture
-								ENQUEUE_UNIQUE_RENDER_COMMAND_TWOPARAMETER(UpdateTexture2D,
-									AOpenCLHUD*, This, this,
-									UTexture2D*, Tex, Texture2D,
-									{
-										const auto TexWidth = Tex->GetSizeX();
-										const auto TexHeight = Tex->GetSizeY();
-										const auto Pitch = GPixelFormats[Tex->GetPixelFormat()].BlockBytes * TexWidth;
-										RHIUpdateTexture2D(Tex->Resource->TextureRHI->GetTexture2D(), 0, FUpdateTextureRegion2D(0, 0, 0, 0, TexWidth, TexHeight), Pitch, reinterpret_cast<const uint8*>(&This->Colors[0]));
-									}
-								);
+								ENQUEUE_RENDER_COMMAND(UpdateTexture2D)(
+									[Tex = Texture2D, this](FRHICommandListImmediate& RHICmdList)
+								{
+									const auto TexWidth = Tex->GetSizeX();
+									const auto TexHeight = Tex->GetSizeY();
+									const auto Pitch = GPixelFormats[Tex->GetPixelFormat()].BlockBytes * TexWidth;
+									RHIUpdateTexture2D(Tex->Resource->TextureRHI->GetTexture2D(), 0, FUpdateTextureRegion2D(0, 0, 0, 0, TexWidth, TexHeight), Pitch, reinterpret_cast<const uint8*>(&Colors[0]));
+								});
 
 								//!< テクスチャを表示
 								//!< Display texture

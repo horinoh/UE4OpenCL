@@ -14,7 +14,6 @@ namespace UnrealBuildTool.Rules
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"Developer/UE4OpenCLEd/Private",
 					// ... add other private include paths required here ...
 				}
 				);
@@ -31,7 +30,9 @@ namespace UnrealBuildTool.Rules
 				}
 				);
 
-			PrivateDependencyModuleNames.AddRange(
+            PrivatePCHHeaderFile = "UE4OpenCLEd.h";
+
+            PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
 					// ... add private dependencies that you statically link with here ...

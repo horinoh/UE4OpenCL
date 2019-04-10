@@ -36,7 +36,7 @@ UObject* UOpenCLCodeFactory::FactoryCreateNew(UClass* InClass, UObject* InParent
 
 UObject* UOpenCLCodeFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
 {
-	FEditorDelegates::OnAssetPreImport.Broadcast(this, InClass, InParent, InName, Type);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, InClass, InParent, InName, Type);
 
 	auto NewAsset = NewObject<UOpenCLCode>(InParent, InName, Flags);
 	if (nullptr != NewAsset)
@@ -49,8 +49,7 @@ UObject* UOpenCLCodeFactory::FactoryCreateText(UClass* InClass, UObject* InParen
 		}
 	}
 
-	FEditorDelegates::OnAssetPostImport.Broadcast(this, NewAsset);
-
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, NewAsset);
 	return NewAsset;
 }
 
