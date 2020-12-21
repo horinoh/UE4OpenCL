@@ -56,7 +56,7 @@ void AOpenCLHUD::DrawHUD()
 						//!< カーネルの実行
 						//!< Execute kernel
 						const size_t GlobalWork[] = { Width, Height };
-						if (CL_SUCCESS == OpenCLComp->EnqueueNDRangeKernel(CommandQueue, Kernel, ARRAY_COUNT(GlobalWork), GlobalWork))
+						if (CL_SUCCESS == OpenCLComp->EnqueueNDRangeKernel(CommandQueue, Kernel, UE_ARRAY_COUNT(GlobalWork), GlobalWork))
 						{
 							Colors.Empty();
 							Colors.SetNumUninitialized(Width * Height);
